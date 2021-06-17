@@ -130,36 +130,47 @@ async def clear(ctx, limit = 10):
     await ctx.channel.purge(limit=limit)
 
 @bot.command(description='Ban a specified user. Only Admins can use this command.')
-@commands.has_permissions(ban_members = True)
-async def ban(ctx, member : discord.Member, *, reason = None):
+@commands.has_permissions(ban_members=True)
+async def ban(ctx, member: discord.Member, *, reason=None):
     role = discord.utils.find(lambda r: r.name == 'Moderator', ctx.message.guild.roles)
-    if (role in member.roles):
-       Title = 'You can not use that command!'
-       embedVar = discord.Embed(title=Title , description='You do not have the permissions to use that command', color=0x00ff00)
-       await ctx.send(embed=embedVar)
-
+    if role in member.roles:
+        embed = discord.Embed(title='Error',
+                              description='You do not have the permissions (Ban Members) to use that command!',
+                              color=0x00ff00)
+        await ctx.send(embed=embed)
     else:
-       await member.ban(reason = reason)
-       Title = f'{str(member)} Has been banned'
-       embedVar = discord.Embed(title=Title , description='', color=0x00ff00)
-       embedVar.add_field(name='Reason ', value=reason, inline=False)
-       await ctx.send(embed=embedVar)
-       await member.send('You have been banned from the programming done right server, submit you ban appeal at this link: https://forms.gle/JiXoo2BdthLUXePHA')
+        if reason is None:
+            reason = 'No reason given'
+        try:
+            await member.ban(reason=reason)
+        except:
+            return await ctx.send(f'Unable to kick user {member}, does the bot have the correct permissions?')
+        embedVar = discord.Embed(title=f'{str(member)} has been banned',
+                                 description=f'Reason: {reason}', color=0x00ff00)
+        await ctx.send(embed=embedVar)
+        await member.send(
+            f'You have been banned from {ctx.guild.name}, submit your ban appeal at this link: https://forms.gle/JiXoo2BdthLUXePHA')
+
 
 @bot.command(description='Kicks a specified user. Only Admins can use this command.')
 @commands.has_permissions(administrator=True)
 async def kick(ctx, member: discord.Member, *, reason=None):
     role = discord.utils.find(lambda r: r.name == 'Moderator', ctx.message.guild.roles)
-    if (role in member.roles):
-       Title = 'You can not use that command!'
-       embedVar = discord.Embed(title=Title , description='You do not have the permissions to use that command', color=0x00ff00)
-       await ctx.send(embed=embedVar)
+    if role in member.roles:
+        embed = discord.Embed(title='Error',
+                              description='You do not have the permissions (Administrator) to use that command!',
+                              color=0x00ff00)
+        await ctx.send(embed=embed)
     else:
-       await member.kick(reason=reason)
-       Title = f'{str(member)} Has been kicked'
-       embedVar = discord.Embed(title=Title , description='', color=0x00ff00)
-       embedVar.add_field(name='Reason ', value=reason, inline=False)
-       await ctx.send(embed=embedVar)
+        if reason is None:
+            reason = 'No reason given'
+        try:
+            await member.kick(reason=reason)
+        except  :
+            return await ctx.send(f'Unable to kick user {member}, does the bot have the correct permissions?')
+        embed = discord.Embed(title=f'{str(member)} Has been kicked',
+                              description=f'Reason: {reason}', color=0x00ff00)
+        await ctx.send(embed=embed)
 
 
 @bot.command(description='Mutes the specified user. Only Moderators can use this command.')
@@ -167,61 +178,66 @@ async def kick(ctx, member: discord.Member, *, reason=None):
 async def mute(ctx, member: discord.Member, *, reason=None):
     guild = ctx.guild
     role = discord.utils.find(lambda r: r.name == 'Moderator', ctx.message.guild.roles)
-    if (role in member.roles):
-       Title = 'You can not use that command!'
-       embedVar = discord.Embed(title=Title , description='You do not have the permissions to use that command', color=0x00ff00)
-       await ctx.send(embed=embedVar)
-      
+    if role in member.roles:
+        embedVar = discord.Embed(title='Error',
+                                 description='You do not have the permissions (Manage Messages) to use that command!',
+                                 color=0x00ff00)
+        await ctx.send(embed=embedVar)
+
     else:
-       mutedRole = discord.utils.get(guild.roles, name='Muted')
-       memberRole = discord.utils.get(guild.roles, name='Member')
-       Title = str(member) + ' Has been muted '
-       embedVar = discord.Embed(title=Title , description='', color=0x00ff00)
-       embedVar.add_field(name='Reason ', value=reason, inline=False)
-       mutedRole = discord.utils.get(ctx.guild.roles, name='Muted')
-       memberRole = discord.utils.get(guild.roles, name='Member')
-       await member.add_roles(mutedRole, reason=reason)
-       await member.remove_roles(memberRole)
-       await ctx.send(embed=embedVar)
-       await member.send(embed=embedVar)
-       list_of_muted_members.append(member)
+        if reason is None:
+            reason = 'No reason given'
+        embedVar = discord.Embed(title=f'Member {str(member)} has been muted',
+                                 description=f'Reason: {reason}', color=0x00ff00)
+        mutedRole = discord.utils.get(ctx.guild.roles, name='Muted')
+        memberRole = discord.utils.get(guild.roles, name='Member')
+        await member.add_roles(mutedRole, reason=reason)
+        await member.remove_roles(memberRole)
+        await ctx.send(embed=embedVar)
+        await member.send(embed=embedVar)
+        list_of_muted_members.append(member)
+
 
 @bot.command(description='Unmutes a specified user. Only Moderators can use this command.')
 @commands.has_permissions(manage_messages=True)
 async def unmute(ctx, member: discord.Member):
     guild = ctx.guild
     role = discord.utils.find(lambda r: r.name == 'Moderator', ctx.message.guild.roles)
-    if (role in member.roles):
-       Title = 'You can not use that command!'
-       embedVar = discord.Embed(title=Title , description='You do not have the permissions to use that command', color=0x00ff00)
-       await ctx.send(embed=embedVar)
+    if role in member.roles:
+        embed = discord.Embed(title='Error',
+                              description='You do not have the permissions (Manage Messages) to use that command!',
+                              color=0x00ff00)
+        await ctx.send(embed=embed)
 
     else:
-       Title = f'{str(member)} Has been unmuted '
-       embedVar = discord.Embed(title=Title , description='', color=0x00ff00)
-       mutedRole = discord.utils.get(ctx.guild.roles, name='Muted')
-       memberRole = discord.utils.get(guild.roles, name='Member')
-       await member.add_roles(memberRole)
-       await member.remove_roles(mutedRole)
-       await ctx.send(embed=embedVar)
-       await member.send(embed=embedVar)
-       list_of_muted_members.remove(member)
+        embedVar = discord.Embed(title=f'{str(member)} has been unmuted',
+                                 description='', color=0x00ff00)
+        mutedRole = discord.utils.get(ctx.guild.roles, name='Muted')
+        memberRole = discord.utils.get(guild.roles, name='Member')
+        await member.add_roles(memberRole)
+        await member.remove_roles(mutedRole)
+        await ctx.send(embed=embedVar)
+        await member.send(embed=embedVar)
+        list_of_muted_members.remove(member)
+
 
 @bot.command()
 @commands.has_permissions(manage_messages=True)
-async def warn(ctx, member: discord.Member, *, reason):
+async def warn(ctx, member: discord.Member, *, reason: str = None):
     role = discord.utils.find(lambda r: r.name == 'Moderator', ctx.message.guild.roles)
-    if (role in member.roles):       
-       Title = 'You can not use that command!'
-       embedVar = discord.Embed(title=Title , description='You do not have the permissions to use that command', color=0x00ff00)
-       await ctx.send(embed=embedVar)
-      
+    if role in member.roles:
+        embed = discord.Embed(title='Error',
+                              description='You do not have the permissions (Manage Messages) to use that command!',
+                              color=0x00ff00)
+        await ctx.send(embed=embed)
+
     else:
-       f'{str(member)} Has been warned '
-       embedVar = discord.Embed(title=Title , description='', color=0x00ff00)
-       embedVar.add_field(name='Reason ', value=reason, inline=False)
-       await ctx.send(embed=embedVar)
-       await member.send(embed=embedVar)
+        if reason is None:
+            reason = 'No reason given'
+        embed = discord.Embed(title=f'Member {str(member)} has been warned',
+                              description=f'Reason: {reason}', color=0x00ff00)
+        await ctx.send(embed=embed)
+        await member.send(embed=embed)
 
 
 keep_alive()
