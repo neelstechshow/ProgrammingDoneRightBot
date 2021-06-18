@@ -188,6 +188,15 @@ async def mute(ctx, member: discord.Member, *, reason=None, hrs, mms):
        list_of_muted_members.append(member)
        time = 60*60*int(hrs)+60 * int(mms)
        await asyncio.sleep(time)
+       Title = f'{str(member)} Has been unmuted '
+       embedVar = discord.Embed(title=Title , description='', color=0x00ff00)
+       mutedRole = discord.utils.get(ctx.guild.roles, name='Muted')
+       memberRole = discord.utils.get(guild.roles, name='Member')
+       await member.add_roles(memberRole)
+       await member.remove_roles(mutedRole)
+       await ctx.send(embed=embedVar)
+       await member.send(embed=embedVar)
+       list_of_muted_members.remove(member)
        
 
 @bot.command(description='Unmutes a specified user. Only Moderators can use this command.')
