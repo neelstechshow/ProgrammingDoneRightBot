@@ -7,6 +7,7 @@ import json
 import random
 import pyjokes
 from discord.ext import tasks
+import asyncio
 
 
 list_of_muted_members = []
@@ -164,7 +165,7 @@ async def kick(ctx, member: discord.Member, *, reason=None):
 
 @bot.command(description='Mutes the specified user. Only Moderators can use this command.')
 @commands.has_permissions(manage_messages=True)
-async def mute(ctx, member: discord.Member, *, reason=None):
+async def mute(ctx, member: discord.Member, *, reason=None, hrs, mms):
     guild = ctx.guild
     role = discord.utils.find(lambda r: r.name == 'Moderator', ctx.message.guild.roles)
     if (role in member.roles):
@@ -185,6 +186,9 @@ async def mute(ctx, member: discord.Member, *, reason=None):
        await ctx.send(embed=embedVar)
        await member.send(embed=embedVar)
        list_of_muted_members.append(member)
+       time = 60*60*int(hrs)+60 * int(mms)
+       await asyncio.sleep(time)
+       
 
 @bot.command(description='Unmutes a specified user. Only Moderators can use this command.')
 @commands.has_permissions(manage_messages=True)
@@ -217,7 +221,7 @@ async def warn(ctx, member: discord.Member, *, reason):
        await ctx.send(embed=embedVar)
       
     else:
-       f'{str(member)} Has been warned '
+       Title = f'{str(member)} Has been warned '
        embedVar = discord.Embed(title=Title , description='', color=0x00ff00)
        embedVar.add_field(name='Reason ', value=reason, inline=False)
        await ctx.send(embed=embedVar)
