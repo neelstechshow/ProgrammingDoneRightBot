@@ -38,7 +38,7 @@ class Moderation(commands.Cog):
     @commands.command(pass_context=True, description='Purges the chat. Only Admins can use this command.')
     @commands.has_permissions(administrator=True)
     async def clear(self, ctx, limit = 10):
-        await ctx.channel.purge(limit=limit)
+        await ctx.channel.purge(limit=limit+1)
 
     @commands.command(description='Ban a specified user. Only Admins can use this command.')
     @commands.has_permissions(ban_members = True)
@@ -134,9 +134,6 @@ class Moderation(commands.Cog):
            embedVar.add_field(name='Reason ', value=reason, inline=False)
            await ctx.send(embed=embedVar)
            await member.send(embed=embedVar)
-
-    
-    
-
+            
 def setup(bot):
     bot.add_cog(Moderation(bot))
